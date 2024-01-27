@@ -1,8 +1,15 @@
-const ImageGalleryItem = () => {
+const ImageGalleryItem = ({id, smallUrl,tags}) => {
     return (
-        <li class="gallery-item">
-        <img src="" alt="" />
+        <li 
+        className="gallery-item"
+        key={id}>
+        <img 
+        src={smallUrl}
+        alt={tags} />
         </li>
     )
 }
 export default ImageGalleryItem;
+
+
+
