@@ -5,13 +5,14 @@ const ImageGallery = ({items, showModal}) => {
 
     return (
         <ul className={css.imageGallery}>
-    {items.map(({id,webformatURL,tags,showModal}) =>
+    {items.map(({id,webformatURL,largeImageURL, tags}) =>
         (<ImageGalleryItem
         showModal={showModal}
         key={id}
         id={id}
         tags={tags}
-        smallUrl={webformatURL}
+        webformatURL={webformatURL}
+        largeImageURL={largeImageURL}
         />))}
         </ul>
     )

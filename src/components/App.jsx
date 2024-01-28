@@ -1,4 +1,5 @@
 import { Component } from "react";
+import Notiflix from 'notiflix';
 
 import Searchbar from "./Searchbar/Searchbar";
 import ImageGallery from "./ImageGallery/ImageGallery";
@@ -20,6 +21,7 @@ export class App extends Component {
     page:1,
     modalOpen:false,
     selectedPhoto:{},
+    btnLoadMore:false,
 
   } 
 
@@ -39,12 +41,25 @@ export class App extends Component {
         loading:true,
       });
       const{data}=await searchGallery(search, page);
+              
+        if (data.totalHits === 0) {
+          return Notiflix.Notify.failure('There are no images matching your search query. Please try again');
+        }
       
       this.setState(({gallery}) => ({
         gallery:data.hits?.length ? [...data.hits] : gallery,
-      
       }))
-      console.log(data.hits);
+
+      const perPage = 12;
+      const totalPage = Math.ceil(data.totalHits / perPage);
+      if (totalPage > page) {
+        this.setState({ btnLoadMore: true });
+      } else {
+        Notiflix.Notify.info(
+          "You've reached the end of search results",
+          );
+        this.setState({ btnLoadMore: false });
+      }
       
     }
     catch (error){
@@ -58,8 +73,7 @@ export class App extends Component {
       })
     }
   }
-
-  
+ 
 
   handleSearch = ({search}) =>{
     this.setState({
@@ -71,14 +85,14 @@ export class App extends Component {
     this.setState(({page}) => ({page:page+1}));
   }
 
-  showModal = ({id,largeImageURL}) => {
+  showModal = ({tags,largeImageURL}) => {
 
     this.setState({
       modalOpen: true,
       selectedPhoto:
       {
-        id,
         largeImageURL,
+        tags,
       }
     })
     console.log(this.state.selectedPhoto);
@@ -94,7 +108,7 @@ export class App extends Component {
 
   render() { 
     const {handleSearch, loadMore, showModal, closeModal}=this;
-    const {gallery,loading, error,modalOpen, selectedPhoto}=this.state;
+    const {gallery,loading, error,modalOpen, selectedPhoto,btnLoadMore}=this.state;
     const isGallery=Boolean(gallery.length)
   
     return (
@@ -104,12 +118,9 @@ export class App extends Component {
         {loading && <Loader/>}
         {error && <p>{error}</p>}
         {isGallery && <ImageGallery showModal={showModal} items={gallery} />}
-        {isGallery && <Button onClick={loadMore} type="button">Load more</Button> }
+        {isGallery && btnLoadMore && <Button onClick={loadMore} type="button">Load more</Button> }
 
-        {modalOpen && <Modal close={closeModal} selectedPhoto={selectedPhoto} />
-          
-          
-          }
+        {modalOpen && <Modal close={closeModal} selectedPhoto={selectedPhoto} />}
     </div>
     
     );

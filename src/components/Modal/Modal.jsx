@@ -2,7 +2,7 @@ import { Component } from "react";
 import { createPortal } from "react-dom";
 
 import css from "./modal.module.css";
-import { Children } from "react";
+
 
 const modalRoot=document.getElementById("modal-root");
 
@@ -10,7 +10,7 @@ export class Modal extends Component {
     
 componentDidMount(){
     document.addEventListener("keydown",this.closeModal)
-
+    
 }
 
 closeModal=({target, currentTarget, code}) => {
@@ -22,9 +22,8 @@ closeModal=({target, currentTarget, code}) => {
     render() {
         const {closeModal} =this;
         const {selectedPhoto}=this.props;
-        console.log(this.props);
-
-       
+        
+      
 
         return createPortal(
             (<div onClick={closeModal} className={css.overlay}>
