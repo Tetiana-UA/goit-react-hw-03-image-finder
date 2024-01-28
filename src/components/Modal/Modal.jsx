@@ -1,7 +1,10 @@
 import { Component } from "react";
+import { createPortal } from "react-dom";
 
 import css from "./modal.module.css";
 import { Children } from "react";
+
+const modalRoot=document.getElementById("modal-root");
 
 export class Modal extends Component {
     
@@ -18,14 +21,21 @@ closeModal=({target, currentTarget, code}) => {
 
     render() {
         const {closeModal} =this;
-        const {children, close}=this.props;
-        return (
-            <div class="overlay">
-  <div className={css.modal}>
-    {children}
+        const {selectedPhoto}=this.props;
+        console.log(this.props);
+
+       
+
+        return createPortal(
+            (<div onClick={closeModal} className={css.overlay}>
+                <div className={css.modal}>
+                    
+                <img src={selectedPhoto.largeImageURL} alt="" />
+
     
-  </div>
-</div>
+                </div>
+            </div>),
+            modalRoot
         );
     }
 }
