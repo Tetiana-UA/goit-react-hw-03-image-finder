@@ -4,10 +4,11 @@ import Searchbar from "./Searchbar/Searchbar";
 import ImageGallery from "./ImageGallery/ImageGallery";
 import { Loader } from "./Loader/Loader";
 import { Button } from "./Button/Button";
+import {Modal} from "./Modal/Modal";
 
 import { searchGallery } from "Api/api";
 
-
+import css from "./app.module.css";
 
 
 export class App extends Component {
@@ -18,7 +19,7 @@ export class App extends Component {
     error:null,
     page:1,
     modalOpen:false,
-    galleryDetails:{},
+    photoDetails:{},
 
   } 
 
@@ -58,35 +59,57 @@ export class App extends Component {
     }
   }
 
-  loadMore = () =>{
-    this.setState(({page}) => ({page:page+1}));
-  }
-
+  
 
   handleSearch = ({search}) =>{
     this.setState({
   search,
 })
+  }
 
+  loadMore = () =>{
+    this.setState(({page}) => ({page:page+1}));
+  }
+
+  showModal = ({largeImageURL}) => {
+    this.setState({
+      modalOpen: true,
+      photoDetails: {
+        largeImageURL,
+      }
+      
+    })
+  }
+  closeModal=()=>{
+    this.setState({
+      modalOpen:false,
+      photoDetails:{}
+    })
   }
 
 
   render() { 
-    const {handleSearch, loadMore}=this;
-    const {gallery,loading, error}=this.state;
+    const {handleSearch, loadMore, showModal, closeModal}=this;
+    const {gallery,loading, error,modalOpen, photoDetails}=this.state;
     const isGallery=Boolean(gallery.length)
   
 
 
     return (
-    <>
+    <div className={css.app}>
     
-    <Searchbar onSubmit={handleSearch}/>
-    {loading && <Loader/>}
-    {error && <p>{error}</p>}
-    {isGallery && <ImageGallery items={gallery} />}
-    {isGallery && <Button onClick={loadMore} type="button">Load more</Button> }
-    </>
+        <Searchbar onSubmit={handleSearch}/>
+        {loading && <Loader/>}
+        {error && <p>{error}</p>}
+        {isGallery && <ImageGallery showModal={showModal} items={gallery} />}
+        {isGallery && <Button onClick={loadMore} type="button">Load more</Button> }
+
+        {modalOpen && <Modal close={closeModal}>
+          <p>{photoDetails.largeImageURL}</p>
+          </Modal>
+          
+          }
+    </div>
     
     );
   }

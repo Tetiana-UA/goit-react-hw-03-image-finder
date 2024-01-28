@@ -1,11 +1,13 @@
 import ImageGalleryItem from "components/ImageGalleryItem/ImageGalleryItem";
+import css from "./image-gallery.module.css";
 
-const ImageGallery = ({items}) => {
+const ImageGallery = ({items, showModal}) => {
 
     return (
-        <ul className="gallery">
-    {items.map(({id,webformatURL,tags}) =>
+        <ul className={css.imageGallery}>
+    {items.map(({id,webformatURL,tags,largeImageURL}) =>
         (<ImageGalleryItem
+        onClick={()=>showModal({largeImageURL})}
         key={id}
         id={id}
         tags={tags}
