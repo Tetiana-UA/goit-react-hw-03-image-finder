@@ -27,19 +27,20 @@ export class App extends Component {
 
   async componentDidUpdate(_,prevState){
     const{search, page}=this.state;
+    //якщо зміниться поле пошуку при onSumit або сторінка при LoadMore, то викликаємо функцію, яка додасть картинки, що відповідають пошуку, в state
     if(search && (search !== prevState.search || page !== prevState.page)){
-      this.fetchGallery();
+      this.addGallery();
       
     }
   }
-
-  async fetchGallery(){
+//Отримуємо галерею картинок, яка  приходить в результаті запиту на REST API і додаємо в state 
+  async addGallery(){
     const{search,page}=this.state;
     try{
-      
-      this.setState({
+        this.setState({
         loading:true,
       });
+      // (data) приходить в результаті запиту на REST API (сама функція запиту searchGallery описана в файлі api)
       const{data}=await searchGallery(search, page);
               
         if (data.totalHits === 0) {
@@ -47,9 +48,11 @@ export class App extends Component {
         }
       
       this.setState(({gallery}) => ({
-        gallery:data.hits?.length ? [...data.hits] : gallery,
+        //Якщо приходить масив картинок hits, і він не пустий, то додаємо його, інакше залишаємо масив gallery, який був у state
+        gallery:data.hits?.length ? [...gallery,...data.hits] : gallery,
       }))
 
+      //Перевірка, чи не закінчилися картинки для відображення кнопки Load More
       const perPage = 12;
       const totalPage = Math.ceil(data.totalHits / perPage);
       if (totalPage > page) {
@@ -75,9 +78,13 @@ export class App extends Component {
   }
  
 
+  //Функція для ортимання інформації з поля пошуку, тобто інпуту
   handleSearch = ({search}) =>{
     this.setState({
-  search,
+  search:search.toLowerCase(),
+  //При введенні нового слова в поле пошуку і клілу (onSubmit) , попередній масив очищаємо, щоб він не залишався на екрані_ і оновлюємо порядок сторінок
+  gallery:[],
+  page:1,
 })
   }
 
@@ -89,13 +96,14 @@ export class App extends Component {
 
     this.setState({
       modalOpen: true,
+      //В state додаємо дані картинки , на яку клікнули, для її відмалювання в модвльному вікні (файл Modal)
       selectedPhoto:
       {
         largeImageURL,
         tags,
       }
     })
-    console.log(this.state.selectedPhoto);
+   
   }
   
   closeModal=()=>{
@@ -109,6 +117,7 @@ export class App extends Component {
   render() { 
     const {handleSearch, loadMore, showModal, closeModal}=this;
     const {gallery,loading, error,modalOpen, selectedPhoto,btnLoadMore}=this.state;
+    //для подальшої перевірки записуємо в константу, що масив картинок(gallery) не порожній , тобто Boolean(gallery.length) буде true. А якщо буде порожній , тоьто false, і далі в return не будемо відмальовувати компоненти
     const isGallery=Boolean(gallery.length)
   
     return (
